@@ -140,6 +140,17 @@ class PSVResigner {
 
     static [PSCustomObject] GetPSVInfo([string] $path) {
         $data = [IO.File]::ReadAllBytes($path)
+
+        if($data.Length -lt [PSVResigner]::TypeOffset + 1) {
+            return [PSCustomObject] @{
+                magic = "Unknown"
+                validMagic = $false
+                type = "Unknown"
+                sign = "Unknown"
+                validSign = $false
+            }
+        }
+
         $type = [int] $data[[PSVResigner]::TypeOffset]
         $sign = [PSVResigner]::GetSignature($data, $type)
 
