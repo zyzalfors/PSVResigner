@@ -88,42 +88,43 @@ class PSVResignerForm : System.Windows.Forms.Form {
     }
 
     hidden [void] PrintPSV() {
-        $info = [PSVResigner]::GetPSVInfo($this.PSVPath)
-        $sb = [System.Text.StringBuilder]::new()
+        try {
+            $info = [PSVResigner]::GetPSVInfo($this.PSVPath)
 
-        [void] $sb.AppendLine("Save: $([IO.Path]::GetFileName($this.PSVPath))")
+            $sb = [System.Text.StringBuilder]::new()
+            [void] $sb.AppendLine("Save: $([IO.Path]::GetFileName($this.PSVPath))")
 
-        if($info.validMagic) {
-            [void] $sb.AppendLine("Magic: $($info.magic)")
+            if($info.validMagic) {
+                [void] $sb.AppendLine("Magic: $($info.magic)")
+            }
+            else {
+                [void] $sb.AppendLine("Magic: $($info.magic) (invalid)")
+            }
+
+            [void] $sb.AppendLine("Type: $($info.type)")
+
+            if($info.validSign) {
+                [void] $sb.Append("Signature: $($info.sign)")
+            }
+            else {
+                [void] $sb.Append("Signature: $($info.sign) (invalid)")
+            }
+
+            $this.PSVInfo.Text = $sb.ToString()
         }
-        else {
-            [void] $sb.AppendLine("Magic: $($info.magic) (invalid)")
+        catch {
+            [void] [System.Windows.Forms.MessageBox]::Show("Unable to print PSV", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
         }
-
-        [void] $sb.AppendLine("Type: $($info.type)")
-
-        if($info.validSign) {
-            [void] $sb.Append("Signature: $($info.sign)")
-        }
-        else {
-            [void] $sb.Append("Signature: $($info.sign) (invalid)")
-        }
-
-        $this.PSVInfo.Text = $sb.ToString()
     }
 
     hidden [void] ResignPSV() {
-        if([string]::IsNullOrWhiteSpace($this.PSVPath)) {
-            return
+        try {
+            [PSVResigner]::ResignPSV($this.PSVPath)
+            [System.Windows.Forms.MessageBox]::Show("Save resigned", "Information", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+            $this.PrintPSV()
         }
-
-        if(-not [System.IO.File]::Exists($this.PSVPath)) {
-            [System.Windows.Forms.MessageBox]::Show("Save not found", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-            return
+        catch {
+            [void] [System.Windows.Forms.MessageBox]::Show("Unable to resign PSV", "Error", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
         }
-
-        [PSVResigner]::ResignPSV($this.PSVPath)
-        [System.Windows.Forms.MessageBox]::Show("Save resigned", "Information", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-        $this.PrintPSV()
     }
 }
