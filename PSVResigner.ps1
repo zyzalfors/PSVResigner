@@ -20,6 +20,14 @@ class PSVResigner {
         }
     }
 
+    hidden static [byte[]] ToBytes([string] $hex) {
+        [byte[]] $buf = for($i = 0; $i -lt $hex.Length; $i += 2) {
+            [Convert]::ToByte($hex.Substring($i, 2), 16)
+        }
+
+        return $buf
+    }
+
     hidden static [byte[]] InvokeAES([string] $mode, [byte[]] $key, [byte[]] $iv, [byte[]] $data, [bool] $dec) {
         $aes = [System.Security.Cryptography.Aes]::Create()
         $aes.Padding = [System.Security.Cryptography.PaddingMode]::None
@@ -130,8 +138,13 @@ class PSVResigner {
     static [void] ResignPSV([string] $path) {
         $data = [IO.File]::ReadAllBytes($path)
         $type = [int] $data[[PSVResigner]::TypeOffset]
+
+        $saveMagic = [PSVResigner]::ToBytes([PSVResigner]::Magic)
+        [Array]::Copy($saveMagic, 0, $data, 0, $saveMagic.Length)
+
         $sign = [PSVResigner]::GetSignature($data, $type)
         [Array]::Copy($sign, 0, $data, [PSVResigner]::HashOffset, 20)
+
         [IO.File]::WriteAllBytes($path, $data)
     }
 
