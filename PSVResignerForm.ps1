@@ -19,7 +19,7 @@ class PSVResignerForm : System.Windows.Forms.Form {
     hidden [string] $PSVPath
     hidden [System.Windows.Forms.Label] $PSVInfo
 
-    PSVResignerForm([string] $path, [bool] $res) {
+    PSVResignerForm() {
         $this.Text = [PSVResignerForm]::Title
         $this.Size = [System.Drawing.Size]::new(390, 140)
         $this.StartPosition = "CenterScreen"
@@ -60,17 +60,6 @@ class PSVResignerForm : System.Windows.Forms.Form {
         $this.PSVInfo.Location = [System.Drawing.Point]::new(5, 30)
         $this.PSVInfo.Size = [System.Drawing.Size]::new(390, 70)
         $this.Controls.Add($this.PSVInfo)
-
-        if([System.IO.File]::Exists($path)) {
-            $this.PSVPath = $path
-
-            if($res) {
-                $this.ResignPSV()
-            }
-            else {
-                $this.PrintPSV()
-            }
-        }
     }
 
     hidden [void] OpenPSV() {
@@ -118,6 +107,10 @@ class PSVResignerForm : System.Windows.Forms.Form {
     }
 
     hidden [void] ResignPSV() {
+        if([string]::IsNullOrWhiteSpace($this.PSVPath)) {
+            return
+        }
+
         try {
             [PSVResigner]::ResignPSV($this.PSVPath)
             [System.Windows.Forms.MessageBox]::Show("Save resigned", "Information", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
