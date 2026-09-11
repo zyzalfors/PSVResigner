@@ -1,19 +1,3 @@
-class DarkToolStripRenderer : System.Windows.Forms.ToolStripProfessionalRenderer {
-
-    DarkToolStripRenderer() : base([System.Windows.Forms.ProfessionalColorTable]::new()) {}
-
-    [void] OnRenderToolStripBorder([System.Windows.Forms.ToolStripRenderEventArgs] $e) {}
-
-    [void] OnRenderButtonBackground([System.Windows.Forms.ToolStripItemRenderEventArgs] $e) {
-        if($e.Item.Selected) {
-            $color = [System.Drawing.Color]::FromArgb(55, 55, 55)
-            $brush = [System.Drawing.SolidBrush]::new($color)
-            $e.Graphics.FillRectangle($brush, $e.Item.ContentRectangle)
-            $brush.Dispose()
-        }
-    }
-}
-
 class PSVResignerForm : System.Windows.Forms.Form {
     hidden static [string] $Title = "PSV Resigner"
     hidden [string] $PSVPath
@@ -26,14 +10,9 @@ class PSVResignerForm : System.Windows.Forms.Form {
         $this.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::FixedSingle
         $this.MaximizeBox = $false
         $this.MinimizeBox = $true
-        $this.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
-        $this.ForeColor = [System.Drawing.Color]::Gainsboro
 
         $toolbar = [System.Windows.Forms.ToolStrip]::new()
         $toolbar.Dock = [System.Windows.Forms.DockStyle]::Top
-        $toolbar.Renderer = [DarkToolStripRenderer]::new()
-        $toolbar.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
-        $toolbar.ForeColor = [System.Drawing.Color]::Gainsboro
         $toolbar.GripStyle = [System.Windows.Forms.ToolStripGripStyle]::Hidden
 
         $open = [System.Windows.Forms.ToolStripButton]::new("Open")
@@ -56,7 +35,6 @@ class PSVResignerForm : System.Windows.Forms.Form {
         [void] $this.Controls.Add($toolbar)
 
         $this.PSVInfo = [System.Windows.Forms.Label]::new()
-        $this.PSVInfo.BackColor = [System.Drawing.Color]::FromArgb(30, 30, 30)
         $this.PSVInfo.Location = [System.Drawing.Point]::new(5, 30)
         $this.PSVInfo.Size = [System.Drawing.Size]::new(390, 70)
         $this.Controls.Add($this.PSVInfo)
